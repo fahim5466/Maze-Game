@@ -1,4 +1,4 @@
-const {World, Engine, Runner, Render, Bodies, Body} = Matter;
+const {World, Engine, Runner, Render, Bodies, Body, Events} = Matter;
 
 const cells = 3;
 const width = 600;
@@ -112,7 +112,10 @@ horizontals.forEach((row, rowIndex) => {
             (rowIndex * unitLength) + unitLength,
             unitLength,
             unitThickness,
-            {isStatic: true}
+            {
+                label: 'wall',
+                isStatic: true
+            }
         );
         World.add(world, horizontalWall);
     });
@@ -129,7 +132,10 @@ verticals.forEach((row, rowIndex) => {
             (rowIndex * unitLength) + (unitLength / 2),
             unitThickness,
             unitLength,
-            {isStatic: true}
+            {
+                label: 'wall',
+                isStatic: true
+            }
         );
         World.add(world, verticalWall);
     });
@@ -141,7 +147,10 @@ const goal = Bodies.rectangle(
     height - (unitLength / 2),
     unitLength * 0.7,
     unitLength * 0.7,
-    {isStatic: true}
+    {
+        label: 'goal',
+        isStatic: true
+    }
 );
 World.add(world, goal);
 
@@ -149,7 +158,10 @@ World.add(world, goal);
 const ball = Bodies.circle(
     unitLength / 2,
     unitLength / 2,
-    unitLength * 0.25
+    unitLength * 0.25,
+    {
+        label: 'ball'
+    }
 );
 World.add(world, ball);
 
@@ -173,4 +185,21 @@ document.addEventListener('keydown', e => {
         // Move left.
         Body.setVelocity(ball, {x: x - unitVelocity, y});
     }
+});
+
+// Add win condition.
+Events.on(engine, 'collisionStart', e => {
+    e.pairs.forEach(collision => {
+        if((collision.bodyA.label === 'goal' && collision.bodyB.label === 'ball') ||
+           (collision.bodyA.label === 'ball' && collision.bodyB.label === 'goal')){
+            // Turn gravity on.
+            world.gravity.y = 1;
+            world.bodies.forEach(body => {
+                // Let the maze walls fall down.
+                if(body.label === 'wall'){
+                    Body.setStatic(body, false);
+                }
+            });
+        }
+    });
 });
