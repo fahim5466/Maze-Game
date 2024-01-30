@@ -3,6 +3,8 @@ const {World, Engine, Runner, Render, Bodies} = Matter;
 const cells = 3;
 const width = 600;
 const height = 600;
+const unitLength = width / cells;
+const unitThickness = 5;
 
 const engine = Engine.create();
 const { world } = engine;
@@ -10,7 +12,7 @@ const render = Render.create({
     element: document.body,
     engine: engine,
     options: {
-        wireframes: false,
+        wireframes: true,
         width,
         height
     }
@@ -95,3 +97,37 @@ const generateMaze = (row, column) => {
 const startRow = Math.floor(Math.random() * cells);
 const startColumn = Math.floor(Math.random() * cells);
 generateMaze(startRow, startColumn);
+
+// Add horizontal walls.
+horizontals.forEach((row, rowIndex) => {
+    row.forEach((isOpen, columnIndex) => {
+        if(isOpen){
+            return;
+        }
+        const horizontalWall = Bodies.rectangle(
+            (columnIndex * unitLength) + (unitLength / 2),
+            (rowIndex * unitLength) + unitLength,
+            unitLength,
+            unitThickness,
+            {isStatic: true}
+        );
+        World.add(world, horizontalWall);
+    });
+});
+
+// Add vertical walls.
+verticals.forEach((row, rowIndex) => {
+    row.forEach((isOpen, columnIndex) => {
+        if(isOpen){
+            return;
+        }
+        const verticalWall = Bodies.rectangle(
+            (columnIndex * unitLength) + unitLength,
+            (rowIndex * unitLength) + (unitLength / 2),
+            unitThickness,
+            unitLength,
+            {isStatic: true}
+        );
+        World.add(world, verticalWall);
+    });
+});
