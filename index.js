@@ -1,12 +1,15 @@
-const {World, Engine, Runner, Render, Bodies} = Matter;
+const {World, Engine, Runner, Render, Bodies, Body} = Matter;
 
 const cells = 3;
 const width = 600;
 const height = 600;
 const unitLength = width / cells;
 const unitThickness = 5;
+const unitVelocity = 5;
 
 const engine = Engine.create();
+// Disable gravity.
+engine.world.gravity.y = 0;
 const { world } = engine;
 const render = Render.create({
     element: document.body,
@@ -149,3 +152,25 @@ const ball = Bodies.circle(
     unitLength * 0.25
 );
 World.add(world, ball);
+
+// Add ball movement.
+document.addEventListener('keydown', e => {
+    const {x, y} = ball.velocity;
+
+    if(e.keyCode === 87){
+        // Move up.
+        Body.setVelocity(ball, {x, y: y - unitVelocity});
+    }
+    else if(e.keyCode === 68){
+        // Move right.
+        Body.setVelocity(ball, {x: x + unitVelocity, y});
+    }
+    else if(e.keyCode === 83){
+        // Move down.
+        Body.setVelocity(ball, {x, y: y + unitVelocity});
+    }
+    else if(e.keyCode === 65){
+        // Move left.
+        Body.setVelocity(ball, {x: x - unitVelocity, y});
+    }
+});
